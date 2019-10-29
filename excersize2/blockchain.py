@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 from uuid import uuid4
 from urllib.parse import urlparse
 
+
 class Blockchain:
     def __init__(self):
         self.chain = []
@@ -14,9 +15,9 @@ class Blockchain:
         self.nodes = set()
 
         # Create the genesis block
-        self.new_block(previous_hash = '1', proof = 100)
+        self.new_block(previous_hash='1', proof=100)
 
-    def new_block(self, proof, previous_hash = None):
+    def new_block(self, proof, previous_hash=None):
         """
         Create a new Block in the blockchain
         :param proof:                       <int> The proof given by the Proof of Work algorithm
@@ -24,11 +25,11 @@ class Blockchain:
         :return:
         """
         block = {
-            'index' : len(self.chain) + 1,
-            'timestamp' : time(),
-            'transactions' : self.pending_transactions,
-            'proof' : proof,
-            'previous_hash' : previous_hash or self.hash(self.chain[-1])
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'transactions': self.pending_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.chain[-1])
         }
 
         # Reset the current list of transactions
@@ -115,7 +116,7 @@ class Blockchain:
             print(block)
             print("\n-------\n")
 
-            #Check that the has of the previous block is correct
+            # Check that the has of the previous block is correct
             if block["previous_hash"] != self.hash(last_block):
                 print("Previous has does not match")
                 return False
@@ -157,32 +158,36 @@ class Blockchain:
 
         return False
 
+
 # Instance our Node
 app = Flask(__name__)
 
-#Generate a globally unique addrss for this node
-node_identifier = str(uuid4()).replace('-','')
+# Generate a globally unique addrss for this node
+node_identifier = str(uuid4()).replace('-', '')
 
 # Instance the Blockchain
 blockchain = Blockchain()
 
-#@app.route('/mine', methods = ["GET"])
-#def mine():
+
+# @app.route('/mine', methods = ["GET"])
+# def mine():
 #    return "We will mine a new block"
 
-@app.route('/transactions/new', methods = ["POST"])
+@app.route('/transactions/new', methods=["POST"])
 def new_transactions():
     return "We will add a new transaction"
 
-@app.route('/chain', methods = ["GET"])
+
+@app.route('/chain', methods=["GET"])
 def full_chain():
     response = {
-        'chain' : blockchain.chain,
-        'length' : len(blockchain.chain)
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain)
     }
     return jsonify(response), 200
 
-@app.route('/transactions/new', methods = ["POST"])
+
+@app.route('/transactions/new', methods=["POST"])
 def new_transaction():
     values = request.get_json()
 
@@ -196,17 +201,18 @@ def new_transaction():
 
     index = blockchain.new_transaction((values["sender"], values["recipient"], values["amount"]))
 
-    response = { "message": f"Transaction will be added to block {index}"}
+    response = {"message": f"Transaction will be added to block {index}"}
     return jsonify(response), 201
 
-@app.route('/mine', methods = ["GET"])
+
+@app.route('/mine', methods=["GET"])
 def mine():
     # Add our mining reward.
     # Sender "0" means new coins.
     blockchain.new_transaction(
-        sender = "0",
-        recipient= node_identifier,
-        amount = 1
+        sender="0",
+        recipient=node_identifier,
+        amount=1
     )
 
     # Make the new block and mine it
@@ -214,16 +220,17 @@ def mine():
     blockchain.proof_of_work(block)
 
     response = {
-        "message" : "New block minded",
-        "index" : block["index"],
-        "transactions" : block["transactions"],
-        "proof" : block["proof"],
-        "previous_hash" : block["previous_hash"]
+        "message": "New block minded",
+        "index": block["index"],
+        "transactions": block["transactions"],
+        "proof": block["proof"],
+        "previous_hash": block["previous_hash"]
     }
 
     return jsonify(response), 200
 
-@app.route('/nodes/register', methods = ['POST'])
+
+@app.route('/nodes/register', methods=['POST'])
 def register_nodes():
     values = request.get_json()
 
@@ -236,44 +243,47 @@ def register_nodes():
         blockchain.register_node(node)
 
     response = {
-        'message' : 'New nodes have been added',
-        'total_nodes' : list(blockchain.nodes)
+        'message': 'New nodes have been added',
+        'total_nodes': list(blockchain.nodes)
     }
 
     return jsonify(response), 200
 
-@app.route('/nodes/resolve', methods = ['GET'])
+
+@app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_confict()
 
     if replaced:
         response = {
-            'message' : 'Our chain was replaced',
-            'new_chain' : blockchain.chain
+            'message': 'Our chain was replaced',
+            'new_chain': blockchain.chain
         }
     else:
         response = {
-            'message' : 'Our chain is authoritative',
-            'chain' : blockchain.chain
+            'message': 'Our chain is authoritative',
+            'chain': blockchain.chain
         }
     return jsonify(response), 200
 
+
 def main():
     from argparse import ArgumentParser
-    #blockchain = Blockchain()
-    #print(blockchain.hash(blockchain.last_block))
-    #blockchain.new_transaction("Alice", "Bob", 50)
-    #blockchain.new_block(0)
-    #print(blockchain.hash(blockchain.last_block))
-    #blockchain.proof_of_work(blockchain.last_block)
-    #print(blockchain.hash(blockchain.last_block))
-    #app.run(host='0.0.0.0', port=5000)
+    # blockchain = Blockchain()
+    # print(blockchain.hash(blockchain.last_block))
+    # blockchain.new_transaction("Alice", "Bob", 50)
+    # blockchain.new_block(0)
+    # print(blockchain.hash(blockchain.last_block))
+    # blockchain.proof_of_work(blockchain.last_block)
+    # print(blockchain.hash(blockchain.last_block))
+    # app.run(host='0.0.0.0', port=5000)
 
     parser = ArgumentParser()
     parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
     args = parser.parse_args()
 
     app.run(host='0.0.0.0', port=args.port)
+
 
 if __name__ == "__main__":
     main()
