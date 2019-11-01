@@ -25,7 +25,7 @@ split_key = derived_key.split(maxsplit=1)
 # encrpytion_key = split_key[0]
 encryption_key = derived_key[:256]
 print("encryption_key=", binascii.hexlify(encryption_key))
-encrpytion_key = encryption_key[:32]
+encrpytion_key = encryption_key[:32] # This can only be 32 bytes max for AES CBC
 print("encryption_key=", binascii.hexlify(encrpytion_key))
 # hmac_key = split_key[1]
 hmac_key = derived_key[256:]
