@@ -1,4 +1,19 @@
-import binascii, hmac, os, scrypt, pyaes, pkcs7, secrets
+import hashlib, binascii, hmac, os, scrypt, secrets
+import json
+
+from Crypto.Cipher import AES
+
+# HMAC code
+def hmac_sha256(key, msg):
+    return hmac.new(key, msg, hashlib.sha256).digest()
+
+# PKCS7 padding
+def pad(m):
+    return m+chr(16-len(m)%16)*(16-len(m)%16)
+
+def unpad(ct):
+    #return ct[:-ord(ct[-1])]
+     return ct[:-ct[-1]]
 
 passwd = "p@$$w0rD~3i"
 
@@ -6,7 +21,7 @@ passwd = "p@$$w0rD~3i"
 print("\nSymmetric Encryption")
 # Original message
 message = 'exercise-cryptography'
-message = 'hello world!!!!!'
+#message = 'hello world!!!!!'
 n = 16384
 r = 16
 p = 1
@@ -21,8 +36,6 @@ derived_key = scrypt.hash(passwd, salt, N=n, r=r, p=p, buflen=buflen)
 print("derived_key=", binascii.hexlify(derived_key))
 
 # Split the derived key into two 256-bit sub-keys
-split_key = derived_key.split(maxsplit=1)
-# encrpytion_key = split_key[0]
 encryption_key = derived_key[:256]
 print("encryption_key=", binascii.hexlify(encryption_key))
 encrpytion_key = encryption_key[:32] # This can only be 32 bytes max for AES CBC
@@ -39,13 +52,43 @@ ivArr = iv.to_bytes(16, byteorder='big')
 print("ivArr=", ivArr)
 print("ivArr len=", len(ivArr))
 
-encrypter = pyaes.AESModeOfOperationCBC(encrpytion_key, iv=ivArr)
-encrypted_message = encrypter.encrypt(message)
-print("encrypted_message in hex=", binascii.hexlify(encrypted_message))
+# With Crypto libs
+cipher = AES.new(encrpytion_key, AES.MODE_CBC, ivArr)
+msg = cipher.encrypt(pad(message))
+print("msg=",binascii.hexlify(msg))
+aes = binascii.hexlify(msg)
 
-decrypter = pyaes.AESModeOfOperationCBC(encrpytion_key , iv=ivArr)
-decrypted_message = decrypter.decrypt(encrypted_message)
-print("decrypted_message=", decrypted_message)
+cipher = AES.new(encrpytion_key, AES.MODE_CBC, ivArr)
+msg = cipher.decrypt(msg)
+print("msg=", unpad(msg))
+
+print("\nHMAC")
+msg = message.encode("utf8")
+mac = hmac_sha256(hmac_key, msg)
+print("HMAC:      ", binascii.hexlify(mac))
+
+output = {
+            'scrypt':{
+                    'salt': str(binascii.hexlify(salt)),
+                    'n' : str(n),
+                    'r' : str(r),
+                    'p' : str(p)
+                },
+            'aes' : str(binascii.hexlify(aes)),
+            'iv' : str(binascii.hexlify(ivArr)),
+            'mac' : str(binascii.hexlify(mac))
+            }
+
+
+print(json.dumps(output))
+
+#encrypter = pyaes.AESModeOfOperationCBC(encrpytion_key, iv=ivArr)
+#encrypted_message = encrypter.encrypt(pad(message))
+#print("encrypted_message in hex=", binascii.hexlify(encrypted_message))
+
+#decrypter = pyaes.AESModeOfOperationCBC(encrpytion_key , iv=ivArr)
+#decrypted_message = decrypter.decrypt(encrypted_message)
+#print("decrypted_message=", upad(decrypted_message))
 # Calculate message authentication code (MAC) using HMAC-SHA256(msg, hmac_key)
 # message_authentication_code=hmac_sha256(hmac_key,binascii.hexlify(message))
 
