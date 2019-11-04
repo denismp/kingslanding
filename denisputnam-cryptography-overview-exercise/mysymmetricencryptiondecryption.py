@@ -7,13 +7,46 @@ from Crypto.Cipher import AES
 def hmac_sha256(key, msg):
     return hmac.new(key, msg, hashlib.sha256).digest()
 
+# # PKCS7 padding
+# def pad(m):
+#     return m+chr(16-len(m)%16)*(16-len(m)%16)
+
 # PKCS7 padding
 def pad(m):
-    return m+chr(16-len(m)%16)*(16-len(m)%16)
+    return m+chr(AES.block_size-len(m)%AES.block_size)*(AES.block_size-len(m)%AES.block_size)
+
 
 def unpad(ct):
     #return ct[:-ord(ct[-1])]
-     return ct[:-ct[-1]]
+    return ct[:-ct[-1]]
+
+# PKCS#7 padding
+# def pad(message, block_size):
+#     padded = message
+#     last_block = len(message) % block_size
+#     to_pad = block_size - last_block
+#     for i in range(to_pad):
+#         padded = padded + chr(to_pad)
+#     return padded
+
+# def unpad(message, block_size):
+#     length = len(message)
+#     if length == 0:
+#         return message
+# 
+#     to_pad = ord(message[length - 1])
+#     if to_pad > block_size:
+#         return message
+# 
+#     if length < to_pad:
+#         return message
+# 
+#     pad_start = length - to_pad
+#     for c in message[pad_start:]:
+#         if c != chr(to_pad):
+#             return message
+# 
+#     return message[:pad_start]
 
 passwd = "p@$$w0rD~3i"
 
@@ -54,7 +87,7 @@ print("ivArr len=", len(ivArr))
 
 # With Crypto libs
 cipher = AES.new(encrpytion_key, AES.MODE_CBC, ivArr)
-msg = cipher.encrypt(pad(message))
+msg = cipher.encrypt(pad(message).encode("utf8"))
 print("msg=",binascii.hexlify(msg))
 aes = binascii.hexlify(msg)
 
