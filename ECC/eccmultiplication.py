@@ -37,4 +37,4 @@ G = Point(15, 13, curve)
 print("Point G = ", str(G))
 
 for k in range(0,6):
-	print(str(k), " * Point G = ", str(k * G))
+	print("k = ", str(k), " * Point G = ", str(k * G))
