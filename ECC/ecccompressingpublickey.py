@@ -4,6 +4,7 @@ from nummaster.basic import sqrtmod
 
 """
 Compressing a Public Key in Python
+The reason to compress the Public key is that it is faster.
     The elliptic curves over Fp
         Have at most 2 points per x
         coordinate(odd y and even y)
