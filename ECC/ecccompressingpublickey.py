@@ -4,6 +4,14 @@ from nummaster.basic import sqrtmod
 
 """
 Compressing a Public Key in Python
+    The elliptic curves over Fp
+        Have at most 2 points per x
+        coordinate(odd y and even y)
+    A public key P(x,y) can be
+    compressed as C(x,odd/even)
+        At the curve Y**2 = X**3 + 7 % 17
+    P(10,15) == C(10,odd)
+        mod_sqrt(x**3 + 7, 17) == y || 17 -y
 """
 def compress_key_pair(key_pair):
     return (key_pair[0], key_pair[1] % 2)
