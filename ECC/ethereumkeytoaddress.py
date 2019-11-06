@@ -8,7 +8,6 @@ Example of Ethereum private key (encoded as 64 hex digits)
 The public key is a EC point (2 * 256 bits == 64 bytes)
     7b83ad6afb1209f3c82ebeb08c0c5fa9bf6724548506f2fb4f991e2287a77090177316ca82b0bdf70cd9dee145c3002c0da1d92626449875972a27807b73b42e
 
-
 Can be compressed to 257 bits (Ethereum uses prefix 02 or 03)
 Example of compressed public key (33 bytes / 66 hex digits):
     027b83ad6afb1209f3c82ebeb08c0c5fa9bf6724548506f2fb4f991e2287a77090
