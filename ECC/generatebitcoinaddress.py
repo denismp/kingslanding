@@ -35,3 +35,5 @@ print("Public key (hex compressed):", compressed_public_key)
 
 address = pubkey_to_address(compressed_public_key)
 print("Compressed Bitcoin address (base58check):", address)
+
+#bitcoin.pubkey_to_address(public_key)
