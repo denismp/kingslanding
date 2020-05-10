@@ -282,4 +282,5 @@ source code files like blockchain.py.
 Submit your zip file as homework at the course Web site.
 
 ** Notes
+
 MI1OD: Blockchain Essentials - USA Self-paced Sept 2019
