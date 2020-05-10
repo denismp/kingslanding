@@ -1,4 +1,4 @@
-# kingslanding
+# kingsland university blockchain exercises
   
 This REPO consist of several exercises.  MI01-Exercise 2 is documented below.
  
